@@ -10,29 +10,25 @@ import random
 
 # Deliberately terrible code for teaching purposes
 
-boid_no = 100
-lower_pos_limits = np.array([100, 900])
-upper_pos_limits = np.array([200,1100])
+boid_no = 20
+lower_pos_limits = np.array([-450, 300.0])
+upper_pos_limits = np.array([50.0,600])
 lower_vel_limits = np.array([0,-20])
 upper_vel_limits = np.array([10,20])
 
 
-
+# Note that lower_limits[x-limit, y-limit]
+# and the same for upper limits
 def new_flock(count, lower_limits, upper_limits):
 	width=upper_limits-lower_limits
 	return lower_limits[:,np.newaxis]  + np.random.rand(2, count)*width[:,np.newaxis]
 
 
-positions=new_flock(boid_no, np.array([100, 900]), np.array([200,1100]))
-
-velocities=new_flock(boid_no, np.array([0,-20]), np.array([10,20]))
+positions=new_flock(boid_no, lower_pos_limits, upper_pos_limits)
+velocities=new_flock(boid_no, lower_vel_limits, upper_vel_limits)
 
 #positions=new_flock(boid_no, lower_pos_limits, upper_pos_limits)
 #velocities=new_flock(boid_no, lower_vel_limits, upper_vel_limits)
-
-
-
-boid_no = 3
 
 boids_x=[random.uniform(-450,50.0) for x in range(boid_no)]
 boids_y=[random.uniform(300.0,600.0) for x in range(boid_no)]
