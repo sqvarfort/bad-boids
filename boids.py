@@ -18,15 +18,8 @@ class Boids(object):
 		self.upper_pos_limits = np.array([50,600])
 		self.lower_vel_limits = np.array([0,-20])
 		self.upper_vel_limits = np.array([10,20])
-		upper_pos_limits = np.copy(self.upper_pos_limits)
-		lower_pos_limits = np.copy(self.lower_pos_limits)
-		lower_vel_limits = np.copy(self.lower_vel_limits)
-		upper_vel_limits = np.copy(self.upper_vel_limits)
-		self.boid_no = boid_no
-		self.positions=self.initialise(boid_no, lower_pos_limits, upper_pos_limits)
-		self.velocities=self.initialise(boid_no, lower_vel_limits, upper_vel_limits)
-		#positions = Boids.positions
-		#velocities = BoidsB.velocities
+		self.positions=self.initialise(boid_no, self.lower_pos_limits, self.upper_pos_limits)
+		self.velocities=self.initialise(boid_no, self.lower_vel_limits, self.upper_vel_limits)
 		self.boids = (self.positions, self.velocities)
 
 		self.figure=plt.figure()
@@ -38,15 +31,7 @@ class Boids(object):
 		plt.xlabel('$x$')
 		plt.rcParams.update({'font.size': 40})
 
-		"""
-		self.figure=plt.figure()
-		self.axes=plt.axes(xlim=(-500,1500), ylim=(-500,1500))
-		self.scatter=self.axes.scatter(self.positions[0,:],self.positions[1,:])
-		plt.ylabel('$y$')
-		plt.title('Boids')
-		plt.xlabel('$x$')
-		plt.rcParams.update({'font.size': 40})
-		"""
+
 
 
 	def initialise(self, count, lower_limits, upper_limits):
@@ -87,9 +72,3 @@ class Boids(object):
 	def animate(self, frames):
 		self.update_boids(self.boids)
 	   	self.scatter.set_offsets(zip(self.positions[0, :],self.positions[1, :]))
-
-#if __name__ == "__main__":
-new_flock = Boids(1000)
-
-anim = animation.FuncAnimation(new_flock.figure, new_flock.animate, frames=50, interval=50)
-plt.show()
