@@ -49,33 +49,41 @@ class Boids(object):
 		return (lower_limits[:,np.newaxis] + np.random.rand(2, count)*width[:,np.newaxis])
 
 
-	def update_boids(self):
-		# Fly towards the middle
+
+	def fly_to_middle(self):
 		middle = np.mean(self.positions,1) # Calculate middle of flcok
 		dir_to_middle = self.positions-middle[:, np.newaxis]
 		middle_strength = 0.01
 		self.velocities -= dir_to_middle*middle_strength
+
+	def avoid_collisions(self):
 		# Avoid collisions
-		separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
-		squared_displacements = separations * separations
-		square_distances = np.sum(squared_displacements, 0)
+		self.separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
+		self.squared_displacements = self.separations * self.separations
+		self.square_distances = np.sum(self.squared_displacements, 0)
 		alert_distance = 100
-		far_away = square_distances > alert_distance # Create logical array
-		separations_if_close = np.copy(separations)
+		far_away = self.square_distances > alert_distance # Create logical array
+		separations_if_close = np.copy(self.separations)
 		separations_if_close[0,:,:][far_away] = 0
 		separations_if_close[1,:,:][far_away] = 0
 		self.velocities += np.sum(separations_if_close,1)
 
+	def match_velocity(self):
 		# Match velocity with nearby birds
 		velocity_differences = self.velocities[:,np.newaxis,:] - self.velocities[:,:,np.newaxis] #Get 10x10 matrix with the difference between every bird
 		formation_flying_distance = 10000 # Set limit to the distance that the birds want
 		formation_flying_strength = 0.125
-		very_far = square_distances > formation_flying_distance
+		very_far = self.square_distances > formation_flying_distance
 		velocity_differences_if_close = np.copy(velocity_differences)
 		velocity_differences_if_close[0,:,:][very_far] = 0
 		velocity_differences_if_close[1,:,:][very_far] = 0
 		self.velocities -= np.mean(velocity_differences_if_close, 1) * formation_flying_strength #
-		dt = 1 # Time constant to define iteration steps
+
+	def update_boids(self):
+		self.fly_to_middle()
+		self.avoid_collisions()
+		self.match_velocity()
+		dt = 1 # Time constant to define iteration steps. This is probably inefficient
 		self.positions += dt * self.velocities # Update velocities
 
 
