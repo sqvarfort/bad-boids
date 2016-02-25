@@ -7,25 +7,35 @@ from matplotlib import pyplot as plt
 from matplotlib import animation
 import numpy as np
 import random
+import yaml
+import os
 
 # Deliberately terrible code for teaching purposes
 
-
 class Boids(object):
-	def __init__(self, boid_no):
+	def __init__(self, boid_no, config):
+		# Open config file
+		input_data = yaml.load(open(os.path.join(os.path.dirname(__file__),config)))
 
-		self.lower_pos_limits = np.array([-450, 300.0])
-		self.upper_pos_limits = np.array([50,600])
-		self.lower_vel_limits = np.array([0,-20])
-		self.upper_vel_limits = np.array([10,20])
+		# Assign config file values to variables
+		position_values = input_data[0]
+		velocity_values = input_data[1]
+
+		# Define input paramters
+		self.lower_pos_limits = np.array([int(position_values['xmin']), int(position_values['ymin'])])
+		self.upper_pos_limits = np.array([int(position_values['xmax']), int(position_values['ymax'])])
+		self.lower_vel_limits = np.array([int(velocity_values['vxmin']), int(velocity_values['vymin'])])
+		self.upper_vel_limits = np.array([int(velocity_values['vxmax']), int(velocity_values['vymax'])])
+
+		# Make 2xN arrays with positions[0] = x-values and positions[1] = y-values
 		self.positions=self.initialise(boid_no, self.lower_pos_limits, self.upper_pos_limits)
 		self.velocities=self.initialise(boid_no, self.lower_vel_limits, self.upper_vel_limits)
-		self.boids = (self.positions, self.velocities)
+		#self.boids = (self.positions, self.velocities)
 
+		# Create figure
 		self.figure=plt.figure()
-		self.axes=plt.axes(xlim=(-500,1500), ylim=(-500,1500))
+		self.axes=plt.axes(xlim=(-500,1500), ylim=(-500,1500)) #Change these into parameters
 		self.scatter=self.axes.scatter(self.positions[0,:],self.positions[1,:])
-
 		plt.ylabel('$y$')
 		plt.title('Boids')
 		plt.xlabel('$x$')
@@ -34,23 +44,23 @@ class Boids(object):
 
 
 
-	def initialise(self, count, lower_limits, upper_limits):
+	def initialise(self, count, lower_limits, upper_limits): # Initialise random values for positions and velocities over the specified range
 		width=upper_limits-lower_limits
 		return (lower_limits[:,np.newaxis] + np.random.rand(2, count)*width[:,np.newaxis])
 
 
-	def update_boids(self, boids):
+	def update_boids(self):
 		# Fly towards the middle
-		middle = np.mean(self.positions,1)
+		middle = np.mean(self.positions,1) # Calculate middle of flcok
 		dir_to_middle = self.positions-middle[:, np.newaxis]
 		middle_strength = 0.01
 		self.velocities -= dir_to_middle*middle_strength
-		#Avoiding collissions
-		separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis]
+		# Avoid collisions
+		separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
 		squared_displacements = separations * separations
 		square_distances = np.sum(squared_displacements, 0)
 		alert_distance = 100
-		far_away = square_distances > alert_distance
+		far_away = square_distances > alert_distance # Create logical array
 		separations_if_close = np.copy(separations)
 		separations_if_close[0,:,:][far_away] = 0
 		separations_if_close[1,:,:][far_away] = 0
@@ -64,11 +74,11 @@ class Boids(object):
 		velocity_differences_if_close = np.copy(velocity_differences)
 		velocity_differences_if_close[0,:,:][very_far] = 0
 		velocity_differences_if_close[1,:,:][very_far] = 0
-		self.velocities -= np.mean(velocity_differences_if_close, 1) * formation_flying_strength
-		dt = 1
-		self.positions += dt * self.velocities
+		self.velocities -= np.mean(velocity_differences_if_close, 1) * formation_flying_strength #
+		dt = 1 # Time constant to define iteration steps
+		self.positions += dt * self.velocities # Update velocities
 
 
-	def animate(self, frames):
-		self.update_boids(self.boids)
+	def animate(self, frames): # Parameters for the animation
+		self.update_boids()
 	   	self.scatter.set_offsets(zip(self.positions[0, :],self.positions[1, :]))
