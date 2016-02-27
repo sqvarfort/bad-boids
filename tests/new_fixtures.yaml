@@ -1,0 +1,12 @@
+!!python/object/apply:numpy.core.multiarray._reconstruct {args: [!!python/name:numpy.ndarray '',
+    !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [!!python/long '2',
+      !!python/long '10'], !!python/object/apply:numpy.dtype {args: [f8, 0, 1], state: !!python/tuple [
+        3, <, null, null, null, -1, -1, 0]}, false, !!binary "lN2mcvy2ccD2mGymp851wDhMPzG2P0hA2JiOXjczR8DQKOvHSC44wJbQGYzs/G3ASPb9c4yCRkCk\n\
+      1z/vZPhjwAJ2P/03aGrAeP4tWMvySsA/vF5ALyl8QB9B9j82pnNAlgq3LuCVekC+Xmg08ptzQAs6\n\
+      sjHYOYFA0Gfzsg25d0Bmytp4nch/QL96p7dEXnNAJOcly+cBgEAktyVPZ6N5QA==\n"]}
+!!python/object/apply:numpy.core.multiarray._reconstruct {args: [!!python/name:numpy.ndarray '',
+    !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [!!python/long '2',
+      !!python/long '10'], !!python/object/apply:numpy.dtype {args: [f8, 0, 1], state: !!python/tuple [
+        3, <, null, null, null, -1, -1, 0]}, false, !!binary "bxmH7/1h9D/tAvZPPOMiQHpZBlXgaB5Aq6SwyQSwIUAknJf9z/QKQKBnYrO4NAFAeWDsBsPND0BM\n\
+      qq7c+JEXQBJJBlQJ0QVAbzADTj1XIkBunPPhF74nQNY7WJMOvjLAhrYdCEB/IEDQM6DNk5gowAK6\n\
+      Nbs11TNArAwB4z7FLcDYxT1uWMwKwMCzwBnXYA1AYIejM+viM0A4u1TAXkgOwA==\n"]}
