@@ -23,3 +23,7 @@ def test_negative_boid_no():
 def test_zero_boids():
     with assert_raises(ValueError) as exception:
         new_flock = Boids(0, config_filename)
+
+def test_wrong_boid_no_type():
+    with assert_raises(TypeError) as exception:
+        new_flock = Boids('string', config_filename)
