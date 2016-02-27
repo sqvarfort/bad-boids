@@ -1,5 +1,10 @@
 """
-A deliberately bad implementation of [Boids](http://dl.acm.org/citation.cfm?doid=37401.37406)
+Boids
+-----------------
+Simulates the behaviour of flocking animals, such as starlings.
+This file contains the Boid class.
+
+Adapted from  deliberately bad implementation of [Boids](http://dl.acm.org/citation.cfm?doid=37401.37406)
 for use as an exercise on refactoring.
 """
 
@@ -14,8 +19,17 @@ import os
 
 class Boids(object):
 	def __init__(self, boid_no, config):
-		# Open config file
-		input_data = yaml.load(open(os.path.join(os.path.dirname(__file__),config)))
+		# Open config file, raise exception if yaml cannot reaad the text.
+		try:
+			input_data = yaml.load(open(os.path.join(os.path.dirname(__file__),config)))
+		except IOError:
+			print 'Could not read file.'
+			raise IOError
+			quit()
+
+		if boid_no == 0:
+			raise ValueError
+			quit()
 
 		# Assign config file values to variables
 		position_values = input_data[0]
@@ -41,23 +55,17 @@ class Boids(object):
 		plt.xlabel('$x$')
 		plt.rcParams.update({'font.size': 40})
 
-
-
-
 	def initialise(self, count, lower_limits, upper_limits): # Initialise random values for positions and velocities over the specified range
 		width=upper_limits-lower_limits
 		return (lower_limits[:,np.newaxis] + np.random.rand(2, count)*width[:,np.newaxis])
 
-
-
-	def fly_to_middle(self):
+	def fly_to_middle(self): # Make the Boids fly towards the middle
 		middle = np.mean(self.positions,1) # Calculate middle of flcok
 		dir_to_middle = self.positions-middle[:, np.newaxis]
 		middle_strength = 0.01
 		self.velocities -= dir_to_middle*middle_strength
 
-	def avoid_collisions(self):
-		# Avoid collisions
+	def avoid_collisions(self): # Include collission detection
 		self.separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
 		self.squared_displacements = self.separations * self.separations
 		self.square_distances = np.sum(self.squared_displacements, 0)
@@ -69,6 +77,10 @@ class Boids(object):
 		self.velocities += np.sum(separations_if_close,1)
 
 	def match_velocity(self):
+		self.separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
+		self.squared_displacements = self.separations * self.separations
+		self.square_distances = np.sum(self.squared_displacements, 0)
+		alert_distance = 100
 		# Match velocity with nearby birds
 		velocity_differences = self.velocities[:,np.newaxis,:] - self.velocities[:,:,np.newaxis] #Get 10x10 matrix with the difference between every bird
 		formation_flying_distance = 10000 # Set limit to the distance that the birds want
@@ -79,7 +91,7 @@ class Boids(object):
 		velocity_differences_if_close[1,:,:][very_far] = 0
 		self.velocities -= np.mean(velocity_differences_if_close, 1) * formation_flying_strength #
 
-	def update_boids(self):
+	def update_boids(self): # Apply all methods
 		self.fly_to_middle()
 		self.avoid_collisions()
 		self.match_velocity()
@@ -87,6 +99,6 @@ class Boids(object):
 		self.positions += dt * self.velocities # Update velocities
 
 
-	def animate(self, frames): # Parameters for the animation
+	def animate(self): # Parameters for the animation
 		self.update_boids()
 	   	self.scatter.set_offsets(zip(self.positions[0, :],self.positions[1, :]))
