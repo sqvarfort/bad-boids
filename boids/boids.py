@@ -43,11 +43,10 @@ class Boids(object):
 		# Make 2xN arrays with positions[0] = x-values and positions[1] = y-values
 		self.positions=self.initialise(boid_no, self.lower_pos_limits, self.upper_pos_limits)
 		self.velocities=self.initialise(boid_no, self.lower_vel_limits, self.upper_vel_limits)
-		#self.boids = (self.positions, self.velocities)
 
 		# Create figure
 		self.figure=plt.figure()
-		self.axes=plt.axes(xlim=(int(self.lower_pos_limits[0]),int(self.upper_pos_limits[0])+1000), ylim=(int(self.lower_pos_limits[1])-500,int(self.upper_pos_limits[1])+500)) #Change these into parameters
+		self.axes=plt.axes(xlim=(int(self.lower_pos_limits[0]),int(self.upper_pos_limits[0])+1000), ylim=(int(self.lower_pos_limits[1])-500,int(self.upper_pos_limits[1])+500)) #Axes will adapt with input parameters
 		self.scatter=self.axes.scatter(self.positions[0,:],self.positions[1,:])
 		plt.ylabel('$y$')
 		plt.title('Boids')
@@ -58,6 +57,12 @@ class Boids(object):
 		width=upper_limits-lower_limits
 		return (lower_limits[:,np.newaxis] + np.random.rand(2, count)*width[:,np.newaxis])
 
+
+	def calculate_separations(self):
+		self.separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
+		self.squared_displacements = self.separations * self.separations
+		self.square_distances = np.sum(self.squared_displacements, 0)
+
 	def fly_to_middle(self): # Make the Boids fly towards the middle
 		middle = np.mean(self.positions,1) # Calculate middle of flcok
 		dir_to_middle = self.positions-middle[:, np.newaxis]
@@ -65,32 +70,28 @@ class Boids(object):
 		self.velocities -= dir_to_middle*middle_strength
 
 	def avoid_collisions(self): # Include collission detection
-		self.separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
-		self.squared_displacements = self.separations * self.separations
-		self.square_distances = np.sum(self.squared_displacements, 0)
+		self.calculate_separations() #update separation matrix
 		alert_distance = 100
 		far_away = self.square_distances > alert_distance # Create logical array
 		separations_if_close = np.copy(self.separations)
 		separations_if_close[0,:,:][far_away] = 0
 		separations_if_close[1,:,:][far_away] = 0
-		self.velocities += np.sum(separations_if_close,1)
+		self.velocities += np.sum(separations_if_close,1) # Update velocities
 
 	def match_velocity(self):
-		self.separations = self.positions[:,np.newaxis,:] - self.positions[:,:,np.newaxis] # Use broacast to calculate a matrix of separations
-		self.squared_displacements = self.separations * self.separations
-		self.square_distances = np.sum(self.squared_displacements, 0)
-		alert_distance = 100
-		# Match velocity with nearby birds
+		self.calculate_separations() #update separation matrix
+		
 		velocity_differences = self.velocities[:,np.newaxis,:] - self.velocities[:,:,np.newaxis] #Get 10x10 matrix with the difference between every bird
 		formation_flying_distance = 10000 # Set limit to the distance that the birds want
 		formation_flying_strength = 0.125
-		very_far = self.square_distances > formation_flying_distance
+		very_far = self.square_distances > formation_flying_distance # Create boolean matrix
 		velocity_differences_if_close = np.copy(velocity_differences)
 		velocity_differences_if_close[0,:,:][very_far] = 0
 		velocity_differences_if_close[1,:,:][very_far] = 0
-		self.velocities -= np.mean(velocity_differences_if_close, 1) * formation_flying_strength #
+		self.velocities -= np.mean(velocity_differences_if_close, 1) * formation_flying_strength # update velocities
 
 	def update_boids(self): # Apply all methods
+		# Call all the methods used
 		self.fly_to_middle()
 		self.avoid_collisions()
 		self.match_velocity()
@@ -98,6 +99,6 @@ class Boids(object):
 		self.positions += dt * self.velocities # Update velocities
 
 
-	def animate(self, frame): # Parameters for the animation
+	def animate(self, frame): # Parameters for the animation. Note that frame cannot be removed.
 		self.update_boids()
 	   	self.scatter.set_offsets(zip(self.positions[0, :],self.positions[1, :]))
