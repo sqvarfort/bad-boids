@@ -35,18 +35,18 @@ class Boids(object):
 		velocity_values = input_data[1]
 
 		# Define input paramters
-		self.lower_pos_limits = np.array([int(position_values['xmin']), int(position_values['ymin'])])
-		self.upper_pos_limits = np.array([int(position_values['xmax']), int(position_values['ymax'])])
-		self.lower_vel_limits = np.array([int(velocity_values['vxmin']), int(velocity_values['vymin'])])
-		self.upper_vel_limits = np.array([int(velocity_values['vxmax']), int(velocity_values['vymax'])])
+		lower_pos_limits = np.array([int(position_values['xmin']), int(position_values['ymin'])])
+		upper_pos_limits = np.array([int(position_values['xmax']), int(position_values['ymax'])])
+		lower_vel_limits = np.array([int(velocity_values['vxmin']), int(velocity_values['vymin'])])
+		upper_vel_limits = np.array([int(velocity_values['vxmax']), int(velocity_values['vymax'])])
 
 		# Make 2xN arrays with positions[0] = x-values and positions[1] = y-values
-		self.positions=self.initialise(boid_no, self.lower_pos_limits, self.upper_pos_limits)
-		self.velocities=self.initialise(boid_no, self.lower_vel_limits, self.upper_vel_limits)
+		self.positions=self.initialise(boid_no, lower_pos_limits, upper_pos_limits)
+		self.velocities=self.initialise(boid_no, lower_vel_limits, upper_vel_limits)
 
 		# Create figure
 		self.figure=plt.figure()
-		self.axes=plt.axes(xlim=(int(self.lower_pos_limits[0]),int(self.upper_pos_limits[0])+1000), ylim=(int(self.lower_pos_limits[1])-500,int(self.upper_pos_limits[1])+500)) #Axes will adapt with input parameters
+		self.axes=plt.axes(xlim=(int(lower_pos_limits[0]),int(upper_pos_limits[0])+1000), ylim=(int(lower_pos_limits[1])-500,int(upper_pos_limits[1])+500)) #Axes will adapt with input parameters
 		self.scatter=self.axes.scatter(self.positions[0,:],self.positions[1,:])
 		plt.ylabel('$y$')
 		plt.title('Boids')
@@ -80,7 +80,6 @@ class Boids(object):
 
 	def match_velocity(self):
 		self.calculate_separations() #update separation matrix
-		
 		velocity_differences = self.velocities[:,np.newaxis,:] - self.velocities[:,:,np.newaxis] #Get 10x10 matrix with the difference between every bird
 		formation_flying_distance = 10000 # Set limit to the distance that the birds want
 		formation_flying_strength = 0.125
