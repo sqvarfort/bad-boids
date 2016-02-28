@@ -9,14 +9,7 @@ Qvarfort, Sofia. "Boids - simulating animal flocking behaviour.", February 2016,
 Please also reference the original work:
 Reynolds, Craig W. "Flocks, herds and schools: A distributed behavioral model." ACM SIGGRAPH computer graphics. Vol. 21. No. 4. ACM, 1987.
 
-Please also reference the
-
-
-
-
-
 Bibtex citation:
-
 @inproceedings{reynolds1987flocks,
   title={Flocks, herds and schools: A distributed behavioral model},
   author={Reynolds, Craig W},
